@@ -1,0 +1,14 @@
+.fetch-container {
+  display: flex;
+  flex-direction: row;
+}
+
+.search-control {
+  width: 300px !important;
+}
+
+.crd-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
