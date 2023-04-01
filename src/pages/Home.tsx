@@ -1,16 +1,32 @@
-import { Component, For } from 'solid-js';
-import { repos, setUsername, username } from '../App';
+import {
+  Component,
+  createResource,
+  createSignal,
+  For,
+  Show,
+  createEffect,
+} from 'solid-js';
 import RepoCard, { Repo } from '../components/RepoCard';
+import axios from 'axios';
 import '../App.css';
+import { setSavedRepos } from './SavedRepos';
 
 const Home: Component = () => {
-  const handleClick = (e: Event) => {
-    e.preventDefault();
-    const userInput = document.querySelector(
-      '#usernameInput'
-    ) as HTMLInputElement;
-    setUsername(userInput.value);
+  const fetchRepos = async (username: string) => {
+    return (
+      await axios.get(
+        `https://api.github.com/users/${username}/repos?sort=created`
+      )
+    ).data;
   };
+
+  const [username, setUsername] = createSignal('');
+  const [repos] = createResource(username, fetchRepos);
+
+  // TODO: this is temporary. should find a solution to share the searched value between home and saved repos pages
+  createEffect(() => {
+    setSavedRepos([]);
+  });
 
   return (
     <>
@@ -20,17 +36,17 @@ const Home: Component = () => {
           class='form-control search-control'
           id='usernameInput'
           value={username()}
+          onInput={(e) => setUsername(e.currentTarget.value)}
           required
           placeholder='GitHub username'
         />
-        <button onClick={handleClick} class='btn btn-dark ms-3 w-auto'>
-          Fetch
-        </button>
       </div>
-      <h3>Github repos for {username()}</h3>
-      <For each={repos()} fallback={<div>Loading...</div>}>
-        {(repo: Repo) => <RepoCard repo={repo} />}
-      </For>
+      <h3>Github repos for {username}</h3>
+      <Show when={!repos.error} fallback={<div>{repos.error.message}</div>}>
+        <For each={repos()} fallback={<div>Loading...</div>}>
+          {(repo: Repo) => <RepoCard repo={repo} />}
+        </For>
+      </Show>
     </>
   );
 };
