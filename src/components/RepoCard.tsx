@@ -1,5 +1,5 @@
 import { Component } from 'solid-js';
-import { savedRepos, setSavedRepos } from '../pages/SavedRepos';
+import { useGlobalContext } from '../GlobalContext/store';
 
 export type Repo = {
   id: string;
@@ -16,21 +16,23 @@ interface Props {
   repo: Repo;
 }
 
-const handleSave = (repo: Repo) => {
-  setSavedRepos([repo, ...savedRepos()]);
-  localStorage.setItem('savedRepos', JSON.stringify(savedRepos()));
-};
-
-const handleUnsave = (repoId: string) => {
-  setSavedRepos(savedRepos()?.filter((repo) => repo.id !== repoId));
-  localStorage.setItem('savedRepos', JSON.stringify(savedRepos()));
-};
-
-const isRepoSaved = (repoId: string) => {
-  return savedRepos()?.find((repo) => repo.id == repoId) ? true : false;
-};
-
 const RepoCard: Component<Props> = ({ repo }) => {
+  const { savedRepos, setSavedRepos } = useGlobalContext();
+
+  const handleSave = (repo: Repo) => {
+    setSavedRepos([repo, ...savedRepos()]);
+    localStorage.setItem('savedRepos', JSON.stringify(savedRepos()));
+  };
+
+  const handleUnsave = (repoId: string) => {
+    setSavedRepos(savedRepos()?.filter((repo) => repo.id !== repoId));
+    localStorage.setItem('savedRepos', JSON.stringify(savedRepos()));
+  };
+
+  const isRepoSaved = (repoId: string) => {
+    return savedRepos()?.find((repo) => repo.id == repoId) ? true : false;
+  };
+
   return (
     <div class='card'>
       <div class='card-header'>&#11088; stars: {repo.stargazers_count}</div>

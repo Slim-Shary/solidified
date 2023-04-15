@@ -1,10 +1,10 @@
-import { Component, createSignal, For } from 'solid-js';
+import { Component, For } from 'solid-js';
 import RepoCard, { Repo } from '../components/RepoCard';
-
-const storedRepos = JSON.parse(localStorage.getItem('savedRepos') || '[]');
-const [savedRepos, setSavedRepos] = createSignal<Repo[]>(storedRepos);
+import { useGlobalContext } from '../GlobalContext/store';
 
 const SavedRepos: Component = () => {
+  const { savedRepos } = useGlobalContext();
+
   return (
     <div>
       <h2>Your saved repos</h2>
@@ -13,5 +13,4 @@ const SavedRepos: Component = () => {
   );
 };
 
-export { savedRepos, setSavedRepos };
 export default SavedRepos;

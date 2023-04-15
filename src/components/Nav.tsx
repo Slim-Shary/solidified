@@ -1,8 +1,9 @@
 import { NavLink } from '@solidjs/router';
 import { Component } from 'solid-js';
-import { savedRepos } from '../pages/SavedRepos';
+import { useGlobalContext } from '../GlobalContext/store';
 
 const Nav: Component = () => {
+  const { savedRepos } = useGlobalContext();
   return (
     <>
       <ul class='nav nav-tabs mt-5 mb-3'>

@@ -1,32 +1,20 @@
-import {
-  Component,
-  createResource,
-  createSignal,
-  For,
-  Show,
-  createEffect,
-} from 'solid-js';
+import { Component, For, Show, createResource, createSignal } from 'solid-js';
 import RepoCard, { Repo } from '../components/RepoCard';
-import axios from 'axios';
+import { useGlobalContext } from '../GlobalContext/store';
 import '../App.css';
-import { setSavedRepos } from './SavedRepos';
+import axios from 'axios';
+
+const fetchRepos = async (username: string) => {
+  return (
+    await axios.get(
+      `https://api.github.com/users/${username}/repos?sort=created`
+    )
+  ).data;
+};
 
 const Home: Component = () => {
-  const fetchRepos = async (username: string) => {
-    return (
-      await axios.get(
-        `https://api.github.com/users/${username}/repos?sort=created`
-      )
-    ).data;
-  };
-
-  const [username, setUsername] = createSignal('');
+  const { username, setUsername } = useGlobalContext();
   const [repos] = createResource(username, fetchRepos);
-
-  // TODO: this is temporary. should find a solution to share the searched value between home and saved repos pages
-  createEffect(() => {
-    setSavedRepos([]);
-  });
 
   return (
     <>
@@ -42,10 +30,15 @@ const Home: Component = () => {
         />
       </div>
       <h3>Github repos for {username}</h3>
-      <Show when={!repos.error} fallback={<div>{repos.error.message}</div>}>
-        <For each={repos()} fallback={<div>Loading...</div>}>
-          {(repo: Repo) => <RepoCard repo={repo} />}
-        </For>
+      <Show when={!repos.loading} fallback={<div>Loading...</div>}>
+        <Show when={!repos.error} fallback={<div>{repos.error.message}</div>}>
+          <For
+            each={repos()}
+            fallback={<span>No repos have been created yet by this user</span>}
+          >
+            {(repo: Repo) => <RepoCard repo={repo} />}
+          </For>
+        </Show>
       </Show>
     </>
   );

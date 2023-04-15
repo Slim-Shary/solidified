@@ -1,8 +1,9 @@
 /* @refresh reload */
 import { render } from 'solid-js/web';
 import App from './App';
-import { Router } from '@solidjs/router';
+import { Router, hashIntegration } from '@solidjs/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { GlobalContextProvider } from './GlobalContext/store';
 
 const root = document.getElementById('root');
 
@@ -14,8 +15,10 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 
 render(
   () => (
-    <Router>
-      <App />
+    <Router source={hashIntegration()}>
+      <GlobalContextProvider>
+        <App />
+      </GlobalContextProvider>
     </Router>
   ),
   root!
